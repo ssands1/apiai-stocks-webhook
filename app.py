@@ -54,7 +54,7 @@ def makeYqlQuery(req):
     parameters = result.get("parameters")
     symb = parameters.get("symbol")
     if symb is None:
-        return None
+    	symb = "AMZN"
 
     return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + "&f=l1c1&e=.csv' and columns='price,change'"
 
@@ -89,7 +89,7 @@ def makeWebhookResult(data):
         "displayText": speech,
         # "data": data,
         # "contextOut": [],
-        "source": "yahoo-finance"
+        "source": "apiai-stocks-webhook"
     }
 
 
