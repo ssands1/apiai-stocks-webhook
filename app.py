@@ -68,17 +68,21 @@ def makeWebhookResult(data):
     if result is None:
         return {}
 
-    price = result.get('price')
+    row = result.get('row')
+    if row is None:
+        return {}
+
+    price = row.get('price')
     if price is None:
         return {}
 
-    change = result.get('change')
+    change = row.get('change')
     if change is None:
         return {}
 
     # print(json.dumps(item, indent=4))
 
-    speech = "The most recent price of " + symb + " stock is $" + price + \
+    speech = "The most recent price of AAPL stock is $" + price + \
              ", and the change on the day is $" + change + "."
 
     print("Response:")
