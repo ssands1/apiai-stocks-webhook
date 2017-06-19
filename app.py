@@ -86,7 +86,7 @@ def makeWebhookResult(data):
 
     # print(json.dumps(item, indent=4))
 
-    speech = "The most recent price of " + symbol + " stock is $" + price + \
+    speech = "The most recent price of " + symbol.upper() + " stock is $" + price + \
              ", and the change on the day is $" + change + "."
 
     print("Response:")
