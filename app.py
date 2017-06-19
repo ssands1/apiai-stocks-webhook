@@ -36,7 +36,7 @@ def webhook():
 
 
 def processRequest(req):
-    if req.get("result").get("action") != "yahooWeatherForecast":
+    if req.get("result").get("action") != "yahooStockData":
         return {}
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
     yql_query = makeYqlQuery(req)
@@ -52,11 +52,11 @@ def processRequest(req):
 def makeYqlQuery(req):
     result = req.get("result")
     parameters = result.get("parameters")
-    city = parameters.get("geo-city")
-    if city is None:
+    symb = parameters.get("symbol")
+    if symb is None:
         return None
 
-    return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "')"
+    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + "&f=l1c1&e=.csv' and columns='price,change'"
 
 
 def makeWebhookResult(data):
@@ -68,24 +68,18 @@ def makeWebhookResult(data):
     if result is None:
         return {}
 
-    channel = result.get('channel')
-    if channel is None:
+    price = result.get('price')
+    if price is None:
         return {}
 
-    item = channel.get('item')
-    location = channel.get('location')
-    units = channel.get('units')
-    if (location is None) or (item is None) or (units is None):
-        return {}
-
-    condition = item.get('condition')
-    if condition is None:
+    change = result.get('change')
+    if change is None:
         return {}
 
     # print(json.dumps(item, indent=4))
 
-    speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
-             ", the temperature is " + condition.get('temp') + " " + units.get('temperature')
+    speech = "The most recent price of " + symb + " stock is $" + price + \
+             ", and the change on the day is $" + change + "."
 
     print("Response:")
     print(speech)
@@ -95,7 +89,7 @@ def makeWebhookResult(data):
         "displayText": speech,
         # "data": data,
         # "contextOut": [],
-        "source": "apiai-weather-webhook-sample"
+        "source": "yahoo-finance"
     }
 
 
