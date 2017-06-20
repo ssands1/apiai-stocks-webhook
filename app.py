@@ -36,7 +36,7 @@ def webhook():
 
 
 def processRequest(req):
-    if req.get("result").get("action") != "yahooStockData":
+    if req.get("result").get("action") == "yahooStockData":
         return {}
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
     yql_query = makeYqlQuery(req)
@@ -57,16 +57,18 @@ def makeYqlQuery(req):
     	symb = "AMZN"
 
     return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + \
-    "&f=sl1c1d1t1ohgpv&e=.csv' and columns='symbol,price,change,date,time,open,high,low,close,volume'"
+    "&f=nsl1c1d1t1ohgpv&e=.csv' and columns='name,symbol,price,change,date,time,open,high,low,close,volume'"
 
 
 def makeWebhookResult(data):
     req = request.get_json(silent=True, force=True)
     action = req.get("result").get("action")
     
+    # assigns all relevant stock values to their names
     query = data.get('query')
     if query is None:
-        return 
+        return {}
+
     result = query.get('results')
     if result is None:
         return {}
@@ -76,6 +78,21 @@ def makeWebhookResult(data):
         return {}
 
     symbol = row.get("symbol")
+    if symbol is None:
+        return {}
+
+    time = row.get('time')
+    if time is None:
+        return {}
+
+    # The following two values aren't currently being used:
+    date = row.get('date')
+    if date is None:
+        return {}
+
+    name = row.get('name')
+    if name is None:
+        return {}
 
     price = row.get('price')
     if price is None:
@@ -83,6 +100,26 @@ def makeWebhookResult(data):
 
     change = row.get('change')
     if change is None:
+        return {}
+
+    open1 = row.get('open')
+    if open1 is None:
+        return {}
+
+    high = row.get('high')
+    if high is None:
+        return {}
+
+    low = row.get('low')
+    if low is None:
+        return {}
+
+    close = row.get('close')
+    if close is None:
+        return {}
+
+    volume = row.get('volume')
+    if volume is None:
         return {}
 
     # print(json.dumps(item, indent=4))
@@ -100,6 +137,42 @@ def makeWebhookResult(data):
         # "contextOut": [],
         "source": "apiai-stocks-webhook"
     }
+    """# determines which answer to give with which values based on the question asked.
+    if action == "price" or action == "change":
+        speech = "The most recent price for " + name + " is $" + price
+        if change[0:1] == "+":
+            speech += "; they're up $" + change[1:] + " as of " + time + " today."
+        elif change[0:1] == "-":
+            speech += "; they're down $" + change[1:] + " as of " + time + " today."
+        else: speech += "; the market is currently closed."
+    
+    elif action == "volume":
+        speech = "The volume of " + name + " is " + volume + "."
+
+    elif action == "open":
+        speech = name + " most recently opened at " + open1 + "."
+
+    elif action == "close":
+        speech = name + " most recently closed at " + close + "."
+
+    elif action == "high":
+        speech = "The high for " + name + " today was " + high + "."
+
+    elif action == "low":
+        speech = "The low for " + name + " today was " + low + "."
+
+    else: speech = "Error: Action requested is undefined."
+    
+    print("Response:")    
+    print(speech)
+
+    return {
+        "speech": speech,
+        "displayText": speech,
+        # "data": data,
+        # "contextOut": [],
+        "source": "apiai-stocks-webhook"
+    }"""
 
 
 if __name__ == '__main__':
