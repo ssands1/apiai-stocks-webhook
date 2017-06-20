@@ -36,6 +36,8 @@ def webhook():
 
 
 def processRequest(req):
+    if req.get("result").get("action") != "yahooStockData":
+        return {}
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
     yql_query = makeYqlQuery(req)
     if yql_query is None:
@@ -55,100 +57,40 @@ def makeYqlQuery(req):
     	symb = "AMZN"
 
     return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + \
-    "&f=nsl1c1d1t1ohgpv&e=.csv' and columns='name,symbol,price,change,date,time,open,high,low,close,volume'"
+    "&f=sl1c1d1t1ohgpv&e=.csv' and columns='symbol,price,change,date,time,open,high,low,close,volume'"
 
 
 def makeWebhookResult(data):
-    # assigns all relevant stock values to their names
-    query = data.get('query')
-    if query is None:
-        return {"displayText": "data retrieval error"}
-
-    result = query.get('results')
-    if result is None:
-        return {"displayText": "data retrieval error"}
-
-    row = result.get('row')
-    if row is None:
-        return {"displayText": "data retrieval error"}
-
-    time = row.get('time')
-    if change is None:
-        return {"displayText": "data retrieval error"}
-
-    """ The following two values aren't currently being used:
-    date = row.get('date')
-    if change is None:
-        return {"displayText": "data retrieval error"}
-
-    symbol = row.get("symbol")
-    if symbol is None:
-        return {"displayText": "data retrieval error"}"""
-
-    name = row.get("name")
-    if name is None:
-        return {"displayText": "data retrieval error"}
-
-    price = row.get('price')
-    if price is None:
-        return {"displayText": "data retrieval error"}
-
-    change = row.get('change')
-    if change is None:
-        return {"displayText": "data retrieval error"}
-
-    open1 = row.get('open')
-    if open1 is None:
-        return {"displayText": "data retrieval error"}
-
-    high = row.get('high')
-    if high is None:
-        return {"displayText": "data retrieval error"}
-
-    low = row.get('low')
-    if low is None:
-        return {"displayText": "data retrieval error"}
-
-    close = row.get('close')
-    if close is None:
-        return {"displayText": "data retrieval error"}
-
-    volume = row.get('volume')
-    if volume is None:
-        return {"displayText": "data retrieval error"}
-
-    # print(json.dumps(item, indent=4))
-
     req = request.get_json(silent=True, force=True)
     action = req.get("result").get("action")
     
-    # determines which answer to give with which values based on the question asked.
-    if action == "price" or action == "change":
-        speech = "The most recent price for " + name + " is $" + price
-        if change[0:1] == "+":
-            speech += "; they're up $" + change[1:] + " as of " + time + " today."
-        elif change[0:1] == "-":
-            speech += "; they're down $" + change[1:] + " as of " + time + " today."
-        else: speech += "; the market is currently closed."
-    
-    elif action == "volume":
-        speech = "The volume of " + name + " is " + volume + "."
+    query = data.get('query')
+    if query is None:
+        return 
+    result = query.get('results')
+    if result is None:
+        return {}
 
-    elif action == "open":
-        speech = name + " most recently opened at " + open1 + "."
+    row = result.get('row')
+    if row is None:
+        return {}
 
-    elif action == "close":
-        speech = name + " most recently closed at " + close + "."
+    symbol = row.get("symbol")
 
-    elif action == "high":
-        speech = "The high for " + name + " today was " + high + "."
+    price = row.get('price')
+    if price is None:
+        return {}
 
-    elif action == "low":
-        speech = "The low for " + name + " today was " + low + "."
+    change = row.get('change')
+    if change is None:
+        return {}
 
-    else: speech = "Error: Action requested is undefined."
-    
-    print("Response:")    
+    # print(json.dumps(item, indent=4))
+
+    speech = "The most recent price of " + symbol.upper() + " stock is $" + price + \
+             ", and the change on the day is $" + change + "."
+
+    print("Response:")
     print(speech)
 
     return {
