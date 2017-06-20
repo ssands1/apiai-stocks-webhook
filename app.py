@@ -124,7 +124,7 @@ def makeWebhookResult(data):
 
     # print(json.dumps(item, indent=4))
 
-    speech = "The most recent price of " + symbol.upper() + " stock is $" + price + \
+    """speech = "The most recent price of " + symbol.upper() + " stock is $" + price + \
              ", and the change on the day is $" + change + "."
 
     print("Response:")
@@ -163,7 +163,7 @@ def makeWebhookResult(data):
 
     else: speech = "Error: Action requested is undefined."
     
-    print("Response:")    
+    print("Response:")
     print(speech)
 
     return {
@@ -172,7 +172,7 @@ def makeWebhookResult(data):
         # "data": data,
         # "contextOut": [],
         "source": "apiai-stocks-webhook"
-    }"""
+    }
 
 
 if __name__ == '__main__':
