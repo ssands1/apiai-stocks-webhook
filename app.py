@@ -125,7 +125,7 @@ def makeWebhookResult(data):
     # print(json.dumps(item, indent=4))
 
     # determines which answer to give with which values based on the question asked.
-    if action == "price" or action == "change":
+    if action == "pricechange":
         speech = "The most recent price for " + name + " is $" + price
         if change[0:1] == "+":
             speech += "; they're up $" + change[1:] + " as of " + time + " today."
@@ -136,17 +136,11 @@ def makeWebhookResult(data):
     elif action == "volume":
         speech = "The volume of " + name + " is " + volume + "."
 
-    elif action == "open":
-        speech = name + " most recently opened at " + open1 + "."
-
-    elif action == "close":
-        speech = name + " most recently closed at " + close + "."
+    elif action == "openclose":
+        speech = name + " most recently opened at " + open1 + "; it most recently closed at " + close + "."
 
     elif action == "highlow":
         speech = "The high for " + name + " today was $" + high + "; the low was $" + low + "."
-
-    elif action == "low":
-        speech = "The low for " + name + " today was " + low + "."
 
     else: speech = "Error: Action requested is undefined."
     
