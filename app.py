@@ -17,16 +17,14 @@ from flask import make_response
 
 # Flask app should start in global layout
 app = Flask(__name__)
-
+req = request.get_json(silent=True, force=True)
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    req = request.get_json(silent=True, force=True)
-
     print("Request:")
     print(json.dumps(req, indent=4))
 
-    res = processRequest(req)
+    res = processRequest()
 
     res = json.dumps(res, indent=4)
     # print(res)
@@ -35,61 +33,120 @@ def webhook():
     return r
 
 
-def processRequest(req):
-    if req.get("result").get("action") != "yahooStockData":
-        return {}
+def processRequest():
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
-    yql_query = makeYqlQuery(req)
+    yql_query = makeYqlQuery()
     if yql_query is None:
         return {}
-    yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
+    yql_url = baseurl + urlencode({'q': yql_query}) + "&f=nsl1c1d1t1ohgpv&e=.csv' " + \
+    "and columns='name,symbol,price,change,date,time,open,high,low,close,volume'&format=json"
     result = urlopen(yql_url).read()
     data = json.loads(result)
     res = makeWebhookResult(data)
     return res
 
 
-def makeYqlQuery(req):
+def makeYqlQuery():
     result = req.get("result")
     parameters = result.get("parameters")
     symb = parameters.get("symbol")
     if symb is None:
-    	symb = "AAPL"
+    	symb = "AMZN"
 
-    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + "&f=sl1c1&e=.csv' and columns='symbol,price,change'"
+    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb
 
 
 def makeWebhookResult(data):
+    # assigns all relevant stock values to their names
     query = data.get('query')
     if query is None:
-        return {}
+        return {"displayText": "data retrieval error"}
 
     result = query.get('results')
     if result is None:
-        return {}
+        return {"displayText": "data retrieval error"}
 
     row = result.get('row')
     if row is None:
-        return {}
+        return {"displayText": "data retrieval error"}
 
-    symbol = row.get('symbol')
+    time = row.get('time')
+    if change is None:
+        return {"displayText": "data retrieval error"}
+
+    """ The following two values aren't currently being used:
+    date = row.get('date')
+    if change is None:
+        return {"displayText": "data retrieval error"}
+
+    symbol = row.get("symbol")
     if symbol is None:
-        return {}
-    
+        return {"displayText": "data retrieval error"}"""
+
+    name = row.get("name")
+    if name is None:
+        return {"displayText": "data retrieval error"}
+
     price = row.get('price')
     if price is None:
-        return {}
+        return {"displayText": "data retrieval error"}
 
     change = row.get('change')
     if change is None:
-        return {}
+        return {"displayText": "data retrieval error"}
+
+    open1 = row.get('open')
+    if change is None:
+        return {"displayText": "data retrieval error"}
+
+    high = row.get('high')
+    if change is None:
+        return {"displayText": "data retrieval error"}
+
+    low = row.get('low')
+    if change is None:
+        return {"displayText": "data retrieval error"}
+
+    close = row.get('close')
+    if change is None:
+        return {"displayText": "data retrieval error"}
+
+    volume = row.get('volume')
+    if change is None:
+        return {"displayText": "data retrieval error"}
+
 
     # print(json.dumps(item, indent=4))
+    # x[1:]
+    # determines which answer to give with which values based on the question asked.
+    action = req.get("result").get("action")
 
-    speech = "The most recent price of " + symbol.upper() + " stock is $" + price + \
-             ", and the change on the day is $" + change + "."
+    if action == "price" or action == "change":
+        speech = "The most recent price for " + name + " is $" + price
+        if change[0:1] == "+":
+        	speech += "; they're up $" + change[1:] + " as of " + time + " today."
+        elif change[0:1] == "-":
+        	speech += "; they're down $" + change[1:] + " as of " + time + " today."
+        else: speech += "; the market is currently closed."
+    
+    elif action == "volume":
+    	speech = "The volume of " + name + " is " + volume + "."
 
-    print("Response:")
+    elif action == "open":
+    	speech = name + " most recently opened at " + open1 + "."
+
+    elif action == "close":
+    	speech = name + " most recently closed at " + close + "."
+
+    elif action == "high":
+    	speech = "The high for " + name + " today was " + high + "."
+
+    elif action == "low":
+    	speech = "The low for " + name + " today was " + low + "."
+
+    else: speech = "Error: Action requested is undefined."
+    
+    print("Response:")    
     print(speech)
 
     return {
