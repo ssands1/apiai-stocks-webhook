@@ -101,7 +101,7 @@ def makeWebhookResult(data):
         speech = "The volume of " + name + " is " + volume + "."
 
     elif action == "openclose":
-        speech = name + " most recently opened at " + open1 + "; it most recently closed at " + close + "."
+        speech = name + " most recently opened at $" + open1 + "; it most recently closed at $" + close + "."
 
     elif action == "highlow":
         speech = "The high for " + name + " today was $" + high + "; the low was $" + low + "."
