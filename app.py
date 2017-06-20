@@ -85,7 +85,7 @@ def makeWebhookResult(data):
     if time is None:
         return {}
 
-    # The following two values aren't currently being used:
+    # date and symbol aren't being used
     date = row.get('date')
     if date is None:
         return {}
@@ -124,20 +124,7 @@ def makeWebhookResult(data):
 
     # print(json.dumps(item, indent=4))
 
-    """speech = "The most recent price of " + symbol.upper() + " stock is $" + price + \
-             ", and the change on the day is $" + change + "."
-
-    print("Response:")
-    print(speech)
-
-    return {
-        "speech": speech,
-        "displayText": speech,
-        # "data": data,
-        # "contextOut": [],
-        "source": "apiai-stocks-webhook"
-    }
-    """# determines which answer to give with which values based on the question asked.
+    # determines which answer to give with which values based on the question asked.
     if action == "price" or action == "change":
         speech = "The most recent price for " + name + " is $" + price
         if change[0:1] == "+":
@@ -155,8 +142,8 @@ def makeWebhookResult(data):
     elif action == "close":
         speech = name + " most recently closed at " + close + "."
 
-    elif action == "high":
-        speech = "The high for " + name + " today was " + high + "."
+    elif action == "highlow":
+        speech = "The high for " + name + " today was $" + high + "; the low was $" + low + "."
 
     elif action == "low":
         speech = "The low for " + name + " today was " + low + "."
