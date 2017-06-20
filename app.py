@@ -36,7 +36,7 @@ def webhook():
 
 
 def processRequest(req):
-    if req.get("result").get("action") != "price":
+    if req.get("result").get("action") != "yahooStockData":
         return {}
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
     yql_query = makeYqlQuery(req)
@@ -54,16 +54,19 @@ def makeYqlQuery(req):
     parameters = result.get("parameters")
     symb = parameters.get("symbol")
     if symb is None:
-    	symb = "AAPL"
+    	symb = "AMZN"
 
-    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + "&f=sl1c1&e=.csv' and columns='symbol,price,change'"
+    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + \
+    "&f=sl1c1d1t1ohgpv&e=.csv' and columns='symbol,price,change,date,time,open,high,low,close,volume'"
 
 
 def makeWebhookResult(data):
+    req = request.get_json(silent=True, force=True)
+    action = req.get("result").get("action")
+    
     query = data.get('query')
     if query is None:
-        return {}
-
+        return 
     result = query.get('results')
     if result is None:
         return {}
@@ -72,10 +75,8 @@ def makeWebhookResult(data):
     if row is None:
         return {}
 
-    symbol = row.get('symbol')
-    if symbol is None:
-        return {}
-    
+    symbol = row.get("symbol")
+
     price = row.get('price')
     if price is None:
         return {}
@@ -86,7 +87,7 @@ def makeWebhookResult(data):
 
     # print(json.dumps(item, indent=4))
 
-    speech = "The most recent price of " + symbol + " stock is $" + price + \
+    speech = "The most recent price of " + symbol.upper() + " stock is $" + price + \
              ", and the change on the day is $" + change + "."
 
     print("Response:")
