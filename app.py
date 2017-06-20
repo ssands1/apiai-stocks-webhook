@@ -65,61 +65,25 @@ def makeWebhookResult(data):
     action = req.get("result").get("action")
     
     # assigns all relevant stock values to their names
-    query = data.get('query')
-    if query is None:
-        return {}
-
-    result = query.get('results')
-    if result is None:
-        return {}
-
-    row = result.get('row')
-    if row is None:
-        return {}
-
-    symbol = row.get("symbol")
-    if symbol is None:
-        return {}
-
-    time = row.get('time')
-    if time is None:
-        return {}
-
     # date and symbol aren't being used
-    date = row.get('date')
-    if date is None:
-        return {}
-
+    query = data.get('query')
+    result = query.get('results')
+    row = result.get('row')
     name = row.get('name')
-    if name is None:
-        return {}
-
+    symbol = row.get("symbol")
     price = row.get('price')
-    if price is None:
-        return {}
-
     change = row.get('change')
-    if change is None:
-        return {}
-
+    date = row.get('date')
+    time = row.get('time')
     open1 = row.get('open')
-    if open1 is None:
-        return {}
-
     high = row.get('high')
-    if high is None:
-        return {}
-
     low = row.get('low')
-    if low is None:
-        return {}
-
     close = row.get('close')
-    if close is None:
-        return {}
-
     volume = row.get('volume')
-    if volume is None:
+    
+    if query is None or result is None or row is None or name is None or symbol is None \
+    or price is None or change is None or date is None or time is None or open1 is None \
+    or high is None or low is None or close is None or volume is None:
         return {}
 
     # print(json.dumps(item, indent=4))
