@@ -54,19 +54,16 @@ def makeYqlQuery(req):
     parameters = result.get("parameters")
     symb = parameters.get("symbol")
     if symb is None:
-    	symb = "AMZN"
+    	symb = "AAPL"
 
-    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + \
-    "&f=sl1c1d1t1ohgpv&e=.csv' and columns='symbol,price,change,date,time,open,high,low,close,volume'"
+    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + "&f=sl1c1&e=.csv' and columns='symbol,price,change'"
 
 
 def makeWebhookResult(data):
-    req = request.get_json(silent=True, force=True)
-    action = req.get("result").get("action")
-    
     query = data.get('query')
     if query is None:
-        return 
+        return {}
+
     result = query.get('results')
     if result is None:
         return {}
@@ -75,8 +72,10 @@ def makeWebhookResult(data):
     if row is None:
         return {}
 
-    symbol = row.get("symbol")
-
+    symbol = row.get('symbol')
+    if symbol is None:
+        return {}
+    
     price = row.get('price')
     if price is None:
         return {}
