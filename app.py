@@ -38,8 +38,7 @@ def processRequest():
     yql_query = makeYqlQuery()
     if yql_query is None:
         return {}
-    yql_url = baseurl + urlencode({'q': yql_query}) + "&f=nsl1c1d1t1ohgpv&e=.csv' " + \
-    "and columns='name,symbol,price,change,date,time,open,high,low,close,volume'&format=json"
+    yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
     result = urlopen(yql_url).read()
     data = json.loads(result)
     res = makeWebhookResult(data)
@@ -53,7 +52,8 @@ def makeYqlQuery():
     if symb is None:
     	symb = "AMZN"
 
-    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb
+    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + \
+    "&f=sl1c1d1t1ohgpv&e=.csv' and columns='symbol,price,change,date,time,open,high,low,close,volume'"
 
 
 def makeWebhookResult(data):
