@@ -98,23 +98,23 @@ def makeWebhookResult(data):
         return {"displayText": "data retrieval error"}
 
     open1 = row.get('open')
-    if change is None:
+    if open1 is None:
         return {"displayText": "data retrieval error"}
 
     high = row.get('high')
-    if change is None:
+    if high is None:
         return {"displayText": "data retrieval error"}
 
     low = row.get('low')
-    if change is None:
+    if low is None:
         return {"displayText": "data retrieval error"}
 
     close = row.get('close')
-    if change is None:
+    if close is None:
         return {"displayText": "data retrieval error"}
 
     volume = row.get('volume')
-    if change is None:
+    if volume is None:
         return {"displayText": "data retrieval error"}
 
     # print(json.dumps(item, indent=4))
