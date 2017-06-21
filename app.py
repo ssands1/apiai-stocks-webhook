@@ -56,8 +56,8 @@ def makeYqlQuery(req):
     if symb is None:
     	symb = "AMZN"
 
-    return "select * from csv where url='https://finance.yahoo.com/d/quotes.csv?s=" + symb + \
-    "&f=nsl1c1d1t1ohgpv&e=.csv' and columns='name,symbol,price,change,date,time,open,high,low,close,volume'"
+    return "select * from csv where url='http://206.155.48.97/gvsi/xml/getdaily?fields=" + \
+    "symbol,date,close&output=csv&includeheaders=false&symbol=AAPL&startdate=06-16-2017&enddate=06-17-2017/'"
 
 
 def makeWebhookResult(data):
